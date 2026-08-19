@@ -50,7 +50,7 @@ public:
             mouse->RecordAction(hook,&shouldTerminate);
 
 
-            cout << "Task 1 finished successfully!\n";
+           // cout << "Task 1 finished successfully!\n";
 
             delete mouse;
 
@@ -76,44 +76,57 @@ public:
             delete keyboard;
             delete hook;
 
-            cout << "Deletion 2 finished successfully!\n";
+           // cout << "Deletion 2 finished successfully!\n";
         }).detach();
     }
-    
-    // Example Task 2
+
     static void ExecuteReplay()
     {
         if (taskState != IDLE) return;
 
+        string saveFileIndex;
+
         string currentFileName = SaveFileHandler::GetSelectedSaveFile();
 
-        thread([currentFileName]() {
+        {
+            ifstream file("D:/MovementRecorder/SaveFiles/ExistingSaveFiles/" + currentFileName);
+
+            file >> saveFileIndex;
+        }
+
+
+        thread([saveFileIndex]() {
 
             taskState = REPLAYING;
 
             MouseAction* mouse = new MouseAction();
-
-            string saveFileIndex;
-
-            {
-                ifstream file("D:/MovementRecorder/SaveFiles/ExistingSaveFiles/" + currentFileName);
-
-                file >> saveFileIndex;
-            }
 
             mouse->ReadFile("D:/MovementRecorder/SaveFiles/Mouse/MouseSaveFile" + saveFileIndex + ".txt");
 
             ///You can change the speed however you want but the minimum recomended is 1000.
             mouse->DoAction(/*speed = n*/);
 
-            cout << "Task 2 finished successfully!\n";
+           // cout << "Task 2 finished successfully!\n";
 
             delete mouse;
 
             taskState = IDLE;
         }).detach();
 
+        thread([saveFileIndex]()
+        {
+            KeyboardAction* keyboard = new KeyboardAction();
 
+            keyboard->ReadFile("D:/MovementRecorder/SaveFiles/Keyboard/KeyboardSaveFile" + saveFileIndex + ".txt");
+
+
+
+            keyboard->DoAction();
+
+           // cout << "Keyboard finished successfully!\n";
+
+            delete keyboard;
+        }).detach();
     }
 
     static void TerminateAllTasks()

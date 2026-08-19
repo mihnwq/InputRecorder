@@ -63,9 +63,8 @@ void MouseAction::RecordAction(MouseHookHandler* hook,std::atomic<bool>* shouldT
 
     if (!fileOUT || !hook) return;
 
-    while (!(*shouldTerminate))
+    while (!shouldTerminate->load())
     {
-
 
         GetCursorPos(&pos);
 
@@ -76,8 +75,6 @@ void MouseAction::RecordAction(MouseHookHandler* hook,std::atomic<bool>* shouldT
         bool rightPressed = GetAsyncKeyState(VK_RBUTTON) & 0x8000;
 
         *fileOUT <<"MOVE "<< x << " " << y << "\n";
-
-
 
         if (leftPressed && !previousLeftPressed)
         {
@@ -105,6 +102,8 @@ void MouseAction::RecordAction(MouseHookHandler* hook,std::atomic<bool>* shouldT
 
         previousLeftPressed = leftPressed;
         previousRightPressed = rightPressed;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
@@ -154,5 +153,5 @@ MouseAction::~MouseAction()
     delete fileOUT;
     delete fileIN;
 
-    cout << "Deletion successful." << endl;
+  //  cout << "Deletion successful." << endl;
 }

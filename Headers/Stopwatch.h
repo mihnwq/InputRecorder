@@ -19,16 +19,22 @@ public:
         running = true;
     }
 
-    double Stop()
+    void Stop()
+    {
+        if (!running)
+            return;
+
+        running = false;
+    }
+
+    double GetTime()
     {
         if (!running)
             return 0.0;
 
-        running = false;
-
         return std::chrono::duration<double>(
-            std::chrono::steady_clock::now() - startTime
-        ).count();
+          std::chrono::steady_clock::now() - startTime
+      ).count();
     }
 
     bool IsRunning() const
