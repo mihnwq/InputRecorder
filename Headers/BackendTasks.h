@@ -30,6 +30,9 @@ public:
 
         string currentFileName = SaveFileHandler::GetSelectedSaveFile();
 
+        if (currentFileName.size() <= 1)
+            return;
+
         string saveFileIndex;
 
         {
@@ -88,12 +91,14 @@ public:
 
         string currentFileName = SaveFileHandler::GetSelectedSaveFile();
 
+        if (currentFileName.size() <= 1)
+            return;
+
         {
             ifstream file("D:/MovementRecorder/SaveFiles/ExistingSaveFiles/" + currentFileName);
 
             file >> saveFileIndex;
         }
-
 
         thread([saveFileIndex]() {
 
@@ -106,8 +111,6 @@ public:
             ///You can change the speed however you want but the minimum recomended is 1000.
             mouse->DoAction(/*speed = n*/);
 
-           // cout << "Task 2 finished successfully!\n";
-
             delete mouse;
 
             taskState = IDLE;
@@ -119,20 +122,27 @@ public:
 
             keyboard->ReadFile("D:/MovementRecorder/SaveFiles/Keyboard/KeyboardSaveFile" + saveFileIndex + ".txt");
 
-
-
             keyboard->DoAction();
-
-           // cout << "Keyboard finished successfully!\n";
 
             delete keyboard;
         }).detach();
     }
 
+    static void ExecuteSequenceRecording()
+    {
+        string currentFileName = SaveFileHandler::GetSelectedSaveFile();
+
+        if (currentFileName.size() <= 1)
+            return;
+
+        std::thread([]()
+        {
+
+        }).detach();
+    }
+
     static void TerminateAllTasks()
     {
-       // cout << SaveFileHandler::GetSelectedSaveFile() << endl;
-
         if (taskState != RECORDING) return;
 
         shouldTerminate = true;

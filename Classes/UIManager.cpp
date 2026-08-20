@@ -8,7 +8,34 @@
 
 using namespace std;
 
-void UIManager::RenderUI() {
+void UIManager::RenderUI()
+{
+    if (currentPage == Page::Main)
+    {
+        RenderMainUI();
+    }
+    else if (currentPage == Page::Sequence)
+    {
+        RenderSequenceUI();
+    }
+}
+
+void UIManager::RenderSequenceUI()
+{
+    ImGui::SetNextWindowSize(ImVec2(1000, 1000), ImGuiCond_FirstUseEver);
+    ImGui::Begin("System Sequences");
+
+    if (ImGui::Button("Back"))
+    {
+        currentPage = Page::Main;
+        SaveFileHandler::SetSelectedSaveFile("");
+    }
+
+    ImGui::End();
+}
+
+void UIManager::RenderMainUI()
+{
 
     ImGui::SetNextWindowSize(ImVec2(1000, 1000), ImGuiCond_FirstUseEver);
 
@@ -31,8 +58,13 @@ void UIManager::RenderUI() {
 
     if (ImGui::Button("CreateNewSave"))
     {
-
         ImGui::OpenPopup("Create New Save");
+    }
+
+    if (ImGui::Button("Open Sequence Page"))
+    {
+        currentPage = Page::Sequence;
+        SaveFileHandler::SetSelectedSaveFile("");
     }
 
     if (ImGui::BeginPopupModal("Create New Save", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -100,13 +132,13 @@ void UIManager::RenderUI() {
 
            // cout<<displayName<<endl;
 
-            bool isSelected = (selectedSaveFile == fileName);
+            bool isSelected = (selectedSaveFileMain == fileName);
 
             if (ImGui::Selectable(displayName.c_str(), isSelected))
             {
-                selectedSaveFile = fileName;
+                selectedSaveFileMain = fileName;
 
-                SaveFileHandler::SetSelectedSaveFile(selectedSaveFile);
+                SaveFileHandler::SetSelectedSaveFile(selectedSaveFileMain);
             }
         }
     }

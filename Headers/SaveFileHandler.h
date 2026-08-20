@@ -16,6 +16,8 @@ class SaveFileHandler
     
     void CreateSaveFile(string fileName) const;
 
+    void CreateSaveFileSequences(string fileName) const;
+
     void DeleteSaveFile() const;
 
     static void SetSelectedSaveFile(string fileName)

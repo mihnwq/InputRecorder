@@ -4,12 +4,20 @@
 
 class UIManager
 {
+    void RenderMainUI();
+    void RenderSequenceUI();
+
+    enum class Page
+    {
+        Main,
+        Sequence
+    };
+    Page currentPage = Page::Main;
+
+    std::string selectedSaveFileMain;
+    std::string selectedSaveFileSequence;
 public:
     void RenderUI();
-
-
-private:
-    std::string selectedSaveFile;
 };
 
 //hello

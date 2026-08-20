@@ -26,7 +26,6 @@ void SaveFileHandler::CreateSaveFile(string fileName) const
         string path = "D:/MovementRecorder/SaveFiles/ExistingSaveFiles/" + fileName + ".txt";
         ofstream file(path, ios::trunc | ios::in | ios::out);
 
-
         file << currentSaveFileNumber;
     }
 
@@ -36,6 +35,29 @@ void SaveFileHandler::CreateSaveFile(string fileName) const
         file << ++currentSaveFileNumber;
     }
 
+}
+
+void SaveFileHandler::CreateSaveFileSequences(string fileName) const {
+    int currentSaveFileNumber = 0;
+
+    {
+        ifstream file("D:/MovementRecorder/SaveFiles/SaveFilesNumberSequences/FileCurrentNumber.txt");
+        file >> currentSaveFileNumber;
+    }
+
+    {
+
+        string path = "D:/MovementRecorder/SaveFiles/ExistingSaveFilesSequences/" + fileName + ".txt";
+        ofstream file(path, ios::trunc | ios::in | ios::out);
+
+        file << currentSaveFileNumber;
+    }
+
+
+    {
+        ofstream file("D:/MovementRecorder/SaveFiles/SequenceSaveFile/FileCurrentNumber.txt", ios::trunc);
+        file << ++currentSaveFileNumber;
+    }
 }
 
 SaveFileHandler::~SaveFileHandler(){}

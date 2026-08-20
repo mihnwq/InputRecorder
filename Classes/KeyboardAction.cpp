@@ -129,6 +129,11 @@ void KeyboardAction::RecordSequence(KeyboardHookHandler *keyboardHookHandler, st
     }
 }
 
+void KeyboardAction::InitiateSequenceAction()
+{
+    std::cout<<"It worked"<<std::endl;
+}
+
 void KeyboardAction::CreateSequence()
 {
     if (!fileIN)
