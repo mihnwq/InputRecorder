@@ -42,7 +42,7 @@ class KeyboardAction
         void RecordSequence(KeyboardHookHandler* keyboardHookHandler, std::atomic<bool>* shoulldTerminate);
 
         void CreateSequence();
-        void CheckSequence(KeyboardHookHandler* keyboardHookHandler , double maxTime = 1000);
+        void CheckSequence(KeyboardHookHandler* keyboardHookHandler ,std::atomic<bool>* shoulldTerminate, double maxTime = 1000);
         void InitiateSequenceAction();
 
         void DoAction();

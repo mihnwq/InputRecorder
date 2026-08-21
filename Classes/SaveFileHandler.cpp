@@ -40,6 +40,8 @@ void SaveFileHandler::CreateSaveFile(string fileName) const
 void SaveFileHandler::CreateSaveFileSequences(string fileName) const {
     int currentSaveFileNumber = 0;
 
+    cout<<"dog";
+
     {
         ifstream file("D:/MovementRecorder/SaveFiles/SaveFilesNumberSequences/FileCurrentNumber.txt");
         file >> currentSaveFileNumber;
@@ -53,9 +55,8 @@ void SaveFileHandler::CreateSaveFileSequences(string fileName) const {
         file << currentSaveFileNumber;
     }
 
-
     {
-        ofstream file("D:/MovementRecorder/SaveFiles/SequenceSaveFile/FileCurrentNumber.txt", ios::trunc);
+        ofstream file("D:/MovementRecorder/SaveFiles/SaveFileNumberSequences/FileCurrentNumber.txt", ios::trunc);
         file << ++currentSaveFileNumber;
     }
 }

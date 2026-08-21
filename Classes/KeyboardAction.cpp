@@ -114,8 +114,6 @@ void KeyboardAction::RecordAction(KeyboardHookHandler *keyboardHookHandler, std:
 }
 
 
-
-
 void KeyboardAction::RecordSequence(KeyboardHookHandler *keyboardHookHandler, std::atomic<bool> *shoulldTerminate)
 {
     if (!fileOUT || !keyboardHookHandler) return;
@@ -139,60 +137,57 @@ void KeyboardAction::CreateSequence()
     if (!fileIN)
         return;
 
-    std::thread([this]()
+    fileIN->clear();
+    fileIN->seekg(0);
+
+    keyQueue = std::queue<WORD>();
+
+    WORD key;
+
+    while (*fileIN >> key)
     {
-        std::lock_guard lock(keyQueueMutex);
+        keyQueue.push(key);
+    }
 
-        fileIN->clear();
-        fileIN->seekg(0);
+    sequenceLength = keyQueue.size();
 
-        keyQueue = std::queue<WORD>();
-
-        WORD key;
-
-        while (*fileIN >> key)
-        {
-            keyQueue.push(key);
-        }
-
-        sequenceLength = keyQueue.size();
-
-    }).detach();
 }
 void KeyboardAction::CheckSequence(
     KeyboardHookHandler* keyboardHookHandler,
+    std::atomic<bool>* shoulldTerminate,
     double maxTime)
 {
     if (!keyboardHookHandler)
         return;
 
-    std::lock_guard lock(keyQueueMutex);
-
     if (keyQueue.empty())
         return;
 
-    currentKey = keyboardHookHandler->GetLastKey();
-
-    if (currentKey == keyQueue.front())
+    while (!shoulldTerminate->load())
     {
-        keyQueue.pop();
+        currentKey = keyboardHookHandler->GetLastKey();
 
-        if (keyQueue.empty())
-            InitiateSequenceAction();
-    }
-    else if (sequenceLength != keyQueue.size())
-    {
-        if (stopwatch.IsRunning())
+        if (currentKey == keyQueue.front())
         {
-            if ((maxTime - stopwatch.GetTime()) < 0)
-            {
-                stopwatch.Stop();
-                CreateSequence();
-            }
+            keyQueue.pop();
+
+            if (keyQueue.empty())
+                InitiateSequenceAction();
         }
-        else
+        else if (sequenceLength != keyQueue.size())
         {
-            stopwatch.Start();
+            if (stopwatch.IsRunning())
+            {
+                if ((maxTime - stopwatch.GetTime()) <= 0)
+                {
+                    stopwatch.Stop();
+                    CreateSequence();
+                }
+            }
+            else
+            {
+                stopwatch.Start();
+            }
         }
     }
 }
@@ -201,40 +196,21 @@ void KeyboardAction::DoAction()
 {
     if (!fileIN) return;
 
-    // std::this_thread::sleep_for(std::chrono::seconds(3));
-    //
-    // HoldKey(0x44);
-    //
-    // std::cout << "started holding D\n";
-    //
-    //
-    //     std::this_thread::sleep_for(std::chrono::seconds(7));
-    //
-    //
-    // ReleaseKey(0x44);
-    //
-    // std::cout << "stopped holding D\n";
-
-
     while(!fileIN->eof())
     {
         *fileIN >> time;
 
         *fileIN >> currentCommand >> currentKey;
 
-       // std::cout << time << "\t" << currentKey << "\t" << currentCommand << std::endl;
-
         std::chrono::duration<double> duration(time);
         std::this_thread::sleep_for(duration);
 
         if (currentCommand.find("DOWN") != std::string::npos)
         {
-            std::cout << currentKey << " Is down"<< std::endl;
             HoldKey(currentKey);
         } else
         {
             ReleaseKey(currentKey);
-            std::cout << currentKey << " Is up"<< std::endl;
         }
 
     }

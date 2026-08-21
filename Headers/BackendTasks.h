@@ -75,7 +75,6 @@ public:
             keyboard->RecordAction(hook,&shouldTerminate);
 
 
-
             delete keyboard;
             delete hook;
 
@@ -130,15 +129,67 @@ public:
 
     static void ExecuteSequenceRecording()
     {
+        string saveFileIndex;
+
         string currentFileName = SaveFileHandler::GetSelectedSaveFile();
 
         if (currentFileName.size() <= 1)
             return;
 
-        std::thread([]()
+        {
+            ifstream file("D:/MovementRecorder/SaveFiles/ExistingSaveFilesSequences/" + currentFileName);
+
+            file >> saveFileIndex;
+        }
+
+        if (currentFileName.size() <= 1)
+            return;
+
+        std::thread([saveFileIndex]()
         {
 
+            KeyboardAction* keyboard = new KeyboardAction();
+            KeyboardHookHandler* hook = new KeyboardHookHandler();
+
+            keyboard->SetFile("D:/MovementRecorder/SaveFiles/SequenceSaveFiles/SequenceSaveFile" + saveFileIndex + ".txt");
+
+            keyboard->RecordSequence(hook,&shouldTerminate);
+
+            delete keyboard;
+            delete hook;
+
         }).detach();
+    }
+
+    static void CheckSequenceExecution()
+    {
+        string saveFileIndex;
+
+        string currentFileName = SaveFileHandler::GetSelectedSaveFile();
+
+        if (currentFileName.size() <= 1)
+            return;
+
+        {
+            ifstream file("D:/MovementRecorder/SaveFiles/ExistingSaveFiles/" + currentFileName);
+
+            file >> saveFileIndex;
+        }
+
+        std::thread([saveFileIndex]()
+      {
+
+          KeyboardAction* keyboard = new KeyboardAction();
+          KeyboardHookHandler* hook = new KeyboardHookHandler();
+
+          keyboard->ReadFile("D:/MovementRecorder/SaveFiles/SequenceSaveFiles/SequenceSaveFile" + saveFileIndex + ".txt");
+
+          keyboard->CheckSequence(hook,&shouldTerminate);
+
+          delete keyboard;
+          delete hook;
+
+      }).detach();
     }
 
     static void TerminateAllTasks()
@@ -150,13 +201,15 @@ public:
 
     static void CreateSaveFile(const string& fileName)
     {
-       thread([fileName]()
-       {
+        SaveFileHandler saveFileHandler;
 
-           SaveFileHandler saveFileHandler;
+        saveFileHandler.CreateSaveFile(fileName);
+    }
 
-           saveFileHandler.CreateSaveFile(fileName);
+    static void CreateSaaveFileSequence(const string& fileName)
+    {
+        SaveFileHandler saveFileHandler;
 
-       }).detach();
+        saveFileHandler.CreateSaveFileSequences(fileName);
     }
 };
